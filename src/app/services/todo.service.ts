@@ -1,64 +1,73 @@
 import { Injectable } from '@angular/core';
 import {Todo} from '../models/todo';
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Injectable()
 export class TodoService {
 
+  private todoList: BehaviorSubject<Todo[]> = new BehaviorSubject([]);
   private readonly LSKEY_TODO = 'todo-list';
-  private todoList: Todo[];
 
   constructor() {
-    this.todoList = JSON.parse(window.localStorage.getItem(this.LSKEY_TODO)) || [];
+    const todos = JSON.parse(window.localStorage.getItem(this.LSKEY_TODO)) || []
+    this.todoList.next(todos);
+    this.todoList.subscribe(() => {
+      this.refreshLocalStorage();
+    });
+  }
+
+  getAllTodos(): Todo[] {
+    return this.todoList.getValue().slice(0);
   }
 
   addTodo(todo: Todo): void {
-    this.todoList.push(todo);
-    this.refreshStorage();
+    const todos = this.getAllTodos();
+    todos.push(todo);
+    this.todoList.next(todos);
   }
 
   editTodo(id, content): void {
-    this.todoList.forEach(t => {
+    const todos = this.getAllTodos();
+
+    todos.forEach(t => {
       if (t.id === id) {
         t.content = content;
       }
     });
-    this.refreshStorage();
+
+    this.todoList.next(todos);
   }
 
   removeTodo(id): void {
-    this.todoList = this.todoList.filter(t => t.id !== id);
-    this.refreshStorage();
-  }
-
-  getAllTodos(): Todo[] {
-    return this.todoList.slice(0);
+    const todos = this.getAllTodos().filter(t => t.id !== id);
+    this.todoList.next(todos);
   }
 
   clearAllCompleted(): void {
-    this.todoList = this.todoList.filter(t => !t.checked);
-    this.refreshStorage();
+    const todos = this.getAllTodos().filter(t => !t.checked);
+    this.todoList.next(todos);
   }
 
   toggleTodo(id): void {
-    this.todoList.forEach(t => {
+    const todos = this.getAllTodos();
+    todos.forEach(t => {
       if (t.id === id) {
         t.checked = !t.checked;
       }
     });
-
-    this.refreshStorage();
+    this.todoList.next(todos);
   }
 
   setCheckForAllTodo(check: boolean): void {
-    this.todoList.forEach(t => {
+    const todos = this.getAllTodos();
+    todos.forEach(t => {
       t.checked = check;
     });
-
-    this.refreshStorage();
+    this.todoList.next(todos);
   }
 
-  refreshStorage(): void {
-    window.localStorage.setItem(this.LSKEY_TODO, JSON.stringify(this.todoList));
+  refreshLocalStorage(): void {
+    window.localStorage.setItem(this.LSKEY_TODO, JSON.stringify(this.getAllTodos()));
   }
 
 }
