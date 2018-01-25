@@ -1,0 +1,30 @@
+<div>
+  <section class="todoapp">
+    <header class="header">
+      <h1>Todos</h1>
+      <input class="new-todo" [(ngModel)]="newTodoInputValue"
+             (keyup.enter)="addTodo()"
+             placeholder="What needs to be done?" autofocus>
+    </header>
+    <section *ngIf="todos.length > 0" class="main">
+      <input class="toggle-all" type="checkbox" (change)="toggleAllTodo()" [checked]="allItemChecked">
+      <ul class="todo-list">
+        <app-todo *ngFor="let todo of todos | filter: todoFilter"
+                  [todo]="todo"
+                  (OnChange)="onTodoChange($event, todo)"
+                  (OnToggle)="onTodoToggle(todo)"
+                  (OnRemoveBtnClicked)="onRemoveBtnClicked(todo)">
+        </app-todo>
+      </ul>
+      <footer class="footer">
+        <span class="todo-count">{{uncheckItems}} item{{ uncheckItems > 1 ? 's' : '' }} left</span>
+        <div class="filters">
+          <a class="filter-all" [class.selected]="todoFilter == filterEnum.ALL" (click)="todoFilter = filterEnum.ALL">All</a>
+          <a class="filter-active" [class.selected]="todoFilter == filterEnum.ACTIVE" (click)="todoFilter = filterEnum.ACTIVE">Active</a>
+          <a class="filter-completed" [class.selected]="todoFilter == filterEnum.COMPLETED" (click)="todoFilter = filterEnum.COMPLETED">Completed</a>
+        </div>
+        <button class="clear-completed" *ngIf="uncheckItems != todos.length" (click)="clearCompleted()">Clear completed</button>
+      </footer>
+    </section>
+  </section>
+</div>

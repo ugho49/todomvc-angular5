@@ -1,0 +1,10 @@
+<li [class.editing]="editing" [class.completed]="todo.checked">
+  <input type="checkbox" class="toggle" (change)="toggleTodo()" [checked]="todo.checked">
+  <label (dblclick)="startEditing(todoItemInput)">{{ todo.content }}</label>
+  <button class="destroy" (click)="removeTodo()"></button>
+  <input #todoItemInput type="text" class="edit"
+         [(ngModel)]="newValueTodo"
+         (blur)="commitEdit()"
+         (keyup.enter)="commitEdit()"
+         (keyup.escape)="cancelEdit()">
+</li>
