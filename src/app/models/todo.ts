@@ -7,7 +7,7 @@ export class Todo {
   public checked: boolean;
 
   constructor() {
-    this.id = uuidv4();
+    this.id = uuidv4().replace(/-/g, '');
     this.content = '';
     this.checked = false;
   }
